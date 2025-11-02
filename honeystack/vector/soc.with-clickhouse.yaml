@@ -145,17 +145,11 @@ args:
   - "/etc/vector/"
 
 # env -- Set environment variables for Vector containers.
-env: []
-  # - name: MY_VARIABLE
-  #   valueFrom:
-  #     secretKeyRef:
-  #       name: vector
-  #       key: my_variable
-  # - name: AWS_ACCESS_KEY_ID
-  #   valueFrom:
-  #     secretKeyRef:
-  #       name: vector
-  #       key: awsAccessKeyId
+env:
+- name: NODE_NAME
+  valueFrom:
+    fieldRef:
+      fieldPath: spec.nodeName
 
 # envFrom -- Define environment variables from Secrets or ConfigMaps.
 envFrom: []
@@ -381,7 +375,7 @@ customConfig:
         .field6 = if exists(.BaseRuntimeMetadata.infectedPID) { .BaseRuntimeMetadata.infectedPID } else { "1" }
         .key, err = to_string(.field1) + to_string(.field2) + to_string(.field3) + to_string(.field4) + to_string(.field5) + to_string(.field6) 
         .md5_hash = to_string(md5(.key))
-        .hostname = get_hostname!()
+        .hostname = get_env_var!("NODE_NAME")
         .event_time = .time
         del(.field1)
         del(.field2)
